@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umatch - CSU UNAB</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Pantalla de Login/Registro -->
+    <div id="login-view" class="view active">
+        <div class="login-container">
+            <div class="login-header">
+                <h1 class="logo">Umatch</h1>
+                <p class="subtitle">Centro de Servicios Universitarios - UNAB</p>
+            </div>
+
+            <div class="login-box">
+                <h2 id="login-title">Iniciar Sesión</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">Correo Institucional</label>
+                        <input type="email" id="email" placeholder="ejemplo@unab.edu.co" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </form>
+                <p class="toggle-auth">
+                    ¿No tienes cuenta? <a href="#" id="toggle-register">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Principal -->
+    <div id="dashboard-view" class="view">
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="logo">Umatch</h1>
+                <div class="user-info">
+                    <button id="profile-btn" class="btn-profile" title="Mi Perfil">
+                        <div class="header-avatar" id="header-avatar">
+                            <span id="header-avatar-text">U</span>
+                        </div>
+                        <span id="user-name" class="user-name-text">Usuario</span>
+                    </button>
+                    <button id="logout-btn" class="btn-icon">
+                        <i data-feather="log-out"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Banner del CSU -->
+        <section class="csu-hero">
+            <!-- Imagen aérea del Centro de Servicios Universitarios -->
+            <img src="https://res.cloudinary.com/dxvl2i2fy/image/upload/v1761662365/1.-Vista-area-CSU_is6yt4.jpg" alt="Vista Aérea del Centro de Servicios Universitarios UNAB" class="csu-hero-image" onerror="this.style.display='none'">
+
+            <div class="csu-hero-overlay">
+                <div class="csu-hero-content">
+                    <h1 class="csu-hero-title">Centro de Servicios Universitarios</h1>
+                    <p class="csu-hero-subtitle">Las mejores instalaciones deportivas de la UNAB a tu disposición</p>
+
+                    <div class="csu-hero-stats">
+                        <div class="hero-stat">
+                            <span class="hero-stat-number">8</span>
+                            <span class="hero-stat-label">Deportes</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-number" id="active-events-count">0</span>
+                            <span class="hero-stat-label">Eventos Activos</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-number" id="active-users-count">0</span>
+                            <span class="hero-stat-label">Usuarios Activos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main class="dashboard-content">
+            <div class="welcome-section">
+                <h2>¡Bienvenido a UMATCH!</h2>
+                <p>Selecciona un deporte para crear o unirte a eventos deportivos, o explora nuestros torneos</p>
+            </div>
+
+            <!-- Widget del Clima para Canchas Destapadas -->
+            <div class="weather-widget" id="weather-widget">
+                <div class="weather-loading">
+                    <div class="weather-spinner"></div>
+                    <p>Cargando información del clima...</p>
+                </div>
+                <div class="weather-content" style="display: none;">
+                    <div class="weather-header">
+                        <h3><i data-feather="cloud" style="width: 20px; height: 20px; display: inline; margin-right: 8px;"></i>Clima en las Canchas del CSU</h3>
+                        <span class="weather-location">Bucaramanga, UNAB</span>
+                    </div>
+                    <div class="weather-main">
+                        <div class="weather-temp">
+                            <span class="temp-value">--</span>
+                            <span class="temp-unit">°C</span>
+                        </div>
+                        <div class="weather-info">
+                            <div class="weather-condition">
+                                <span class="condition-icon">☀️</span>
+                                <span class="condition-text">--</span>
+                            </div>
+                            <div class="weather-details">
+                                <div class="detail-item">
+                                    <span class="detail-icon">💧</span>
+                                    <span class="detail-label">Humedad:</span>
+                                    <span class="detail-value" id="humidity">--%</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-icon">🌬️</span>
+                                    <span class="detail-label">Viento:</span>
+                                    <span class="detail-value" id="wind">-- km/h</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-icon">🌧️</span>
+                                    <span class="detail-label">Precipitación:</span>
+                                    <span class="detail-value" id="precipitation">--%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="weather-recommendation" id="weather-recommendation">
+                        <span class="recommendation-icon">✅</span>
+                        <span class="recommendation-text">Condiciones ideales para deportes al aire libre</span>
+                    </div>
+                    <div class="weather-update">
+                        <span>Última actualización: <span id="last-update">--:--</span></span>
+                        <button class="btn-refresh" id="refresh-weather" title="Actualizar clima">
+                            <i data-feather="refresh-cw"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Destacada de Torneos -->
+            <div class="tournament-highlight">
+                <div class="tournament-promo-card" id="tournaments-card">
+                    <div class="tournament-promo-icon">
+                        <i data-feather="award" style="width: 64px; height: 64px; stroke-width: 1.5;"></i>
+                    </div>
+                    <div class="tournament-promo-content">
+                        <h3>Torneos Deportivos</h3>
+                        <p>Compite en torneos oficiales de la UNAB o crea tu propio torneo amistoso</p>
+                        <button class="btn btn-tournament">Ver Torneos</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrusel de Instalaciones del CSU -->
+            <section class="csu-carousel-section">
+                <div class="carousel-header">
+                    <h3>Conoce Nuestros Espacios</h3>
+                    <p>Descubre las increíbles instalaciones del Centro de Servicios Universitarios</p>
+                </div>
+
+                <div class="carousel-container">
+                    <div class="carousel-wrapper">
+                        <!-- Slide 1 -->
+                        <div class="carousel-slide active">
+                            <img src="https://res.cloudinary.com/dxvl2i2fy/image/upload/v1761662493/csu-1_rerhgk.jpg" alt="Espacios deportivos del CSU" class="carousel-image">
+                            <div class="carousel-caption">
+                                <h4 class="carousel-title">Instalaciones de Primera</h4>
+                                <p class="carousel-description">Espacios modernos equipados con tecnología de última generación</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="carousel-slide">
+                            <img src="https://res.cloudinary.com/dxvl2i2fy/image/upload/v1761662470/csu-3-500x328_vz5nuy.jpg" alt="Áreas recreativas del CSU" class="carousel-image">
+                            <div class="carousel-caption">
+                                <h4 class="carousel-title">Áreas Recreativas</h4>
+                                <p class="carousel-description">Disfruta de espacios diseñados para tu bienestar y entretenimiento</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="carousel-slide">
+                            <img src="https://res.cloudinary.com/dxvl2i2fy/image/upload/v1761662505/csu-2_xnjztg.jpg" alt="Canchas al aire libre del CSU" class="carousel-image">
+                            <div class="carousel-caption">
+                                <h4 class="carousel-title">Canchas al Aire Libre</h4>
+                                <p class="carousel-description">Amplias canchas exteriores para tus deportes favoritos</p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="carousel-slide">
+                            <img src="https://res.cloudinary.com/dxvl2i2fy/image/upload/v1761662538/csu-4_tornzp.jpg" alt="Zonas cubiertas del CSU" class="carousel-image">
+                            <div class="carousel-caption">
+                                <h4 class="carousel-title">Espacios Cubiertos</h4>
+                                <p class="carousel-description">Instalaciones techadas disponibles todo el año</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controles de Navegación -->
+                    <button class="carousel-control prev" aria-label="Anterior">
+                        <i data-feather="chevron-left"></i>
+                    </button>
+                    <button class="carousel-control next" aria-label="Siguiente">
+                        <i data-feather="chevron-right"></i>
+                    </button>
+
+                    <!-- Indicadores -->
+                    <div class="carousel-indicators">
+                        <button class="carousel-indicator active" data-slide="0" aria-label="Ir a slide 1"></button>
+                        <button class="carousel-indicator" data-slide="1" aria-label="Ir a slide 2"></button>
+                        <button class="carousel-indicator" data-slide="2" aria-label="Ir a slide 3"></button>
+                        <button class="carousel-indicator" data-slide="3" aria-label="Ir a slide 4"></button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="section-divider">
+                <h3>Eventos Deportivos</h3>
+            </div>
+
+            <div class="sports-grid">
+                <div class="sport-card" data-sport="futbol" data-outdoor="true">
+                    <div class="weather-indicator" id="weather-futbol">
+                        <span class="weather-status">--</span>
+                    </div>
+                    <div class="sport-icon">
+                        <span class="sport-emoji">⚽</span>
+                    </div>
+                    <h3>Fútbol</h3>
+                    <p>Canchas disponibles</p>
+                    <div class="sport-weather-info">
+                        <span class="weather-badge">Cancha destapada</span>
+                    </div>
+                </div>
+                <div class="sport-card" data-sport="basketball" data-outdoor="true">
+                    <div class="weather-indicator" id="weather-basketball">
+                        <span class="weather-status">--</span>
+                    </div>
+                    <div class="sport-icon">
+                        <span class="sport-emoji">🏀</span>
+                    </div>
+                    <h3>Basketball</h3>
+                    <p>Canchas disponibles</p>
+                    <div class="sport-weather-info">
+                        <span class="weather-badge">Cancha destapada</span>
+                    </div>
+                </div>
+                <div class="sport-card" data-sport="tenis" data-outdoor="true">
+                    <div class="weather-indicator" id="weather-tenis">
+                        <span class="weather-status">--</span>
+                    </div>
+                    <div class="sport-icon">
+                        <span class="sport-emoji">🎾</span>
+                    </div>
+                    <h3>Tenis</h3>
+                    <p>Canchas disponibles</p>
+                    <div class="sport-weather-info">
+                        <span class="weather-badge">Cancha destapada</span>
+                    </div>
+                </div>
+                <div class="sport-card" data-sport="padel" data-outdoor="true">
+                    <div class="weather-indicator" id="weather-padel">
+                        <span class="weather-status">--</span>
+                    </div>
+                    <div class="sport-icon">
+                        <span class="sport-emoji">🎾</span>
+                    </div>
+                    <h3>Pádel</h3>
+                    <p>Canchas disponibles</p>
+                    <div class="sport-weather-info">
+                        <span class="weather-badge">Cancha destapada</span>
+                    </div>
+                </div>
+                <div class="sport-card" data-sport="volleyball" data-outdoor="true">
+                    <div class="weather-indicator" id="weather-volleyball">
+                        <span class="weather-status">--</span>
+                    </div>
+                    <div class="sport-icon">
+                        <span class="sport-emoji">🏐</span>
+                    </div>
+                    <h3>Volleyball</h3>
+                    <p>Canchas disponibles</p>
+                    <div class="sport-weather-info">
+                        <span class="weather-badge">Cancha destapada</span>
+                    </div>
+                </div>
+                <div class="sport-card" data-sport="billar" data-outdoor="false">
+                    <div class="sport-icon">
+                        <span class="sport-emoji">🎱</span>
+                    </div>
+                    <h3>Billar</h3>
+                    <p>Mesas disponibles</p>
+                    <div class="sport-weather-info">
+                        <span class="weather-badge indoor">Espacio techado</span>
+                    </div>
+                </div>
+                <div class="sport-card" data-sport="pingpong" data-outdoor="false">
+                    <div class="sport-icon">
+                        <span class="sport-emoji">🏓</span>
+                    </div>
+                    <h3>Ping Pong</h3>
+                    <p>Mesas disponibles</p>
+                    <div class="sport-weather-info">
+                        <span class="weather-badge indoor">Espacio techado</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Vista de Eventos por Deporte -->
+    <div id="events-view" class="view">
+        <header class="app-header">
+            <div class="header-content">
+                <button id="back-to-dashboard" class="btn-back">← Volver</button>
+                <h1 id="sport-title" class="logo">Deporte</h1>
+                <div class="user-info">
+                    <span id="user-name-events">Usuario</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Widget del clima en la vista de eventos -->
+        <div class="events-weather-alert" id="events-weather-alert" style="display: none;">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <p class="alert-title">Condiciones climáticas actuales</p>
+                <p class="alert-description"></p>
+            </div>
+        </div>
+
+        <main class="events-content">
+            <div class="events-header">
+                <h2>Eventos Disponibles</h2>
+                <button id="create-event-btn" class="btn btn-primary">+ Crear Evento</button>
+            </div>
+
+            <div id="events-list" class="events-list">
+                <!-- Los eventos se cargarán dinámicamente -->
+            </div>
+
+            <div id="no-events" class="no-events" style="display: none;">
+                <p>No hay eventos disponibles para este deporte</p>
+                <p>¡Sé el primero en crear uno!</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Vista de Crear Evento -->
+    <div id="create-event-view" class="view">
+        <header class="app-header">
+            <div class="header-content">
+                <button id="back-to-events" class="btn-back">← Volver</button>
+                <h1 class="logo">Crear Evento</h1>
+            </div>
+        </header>
+
+        <main class="create-event-content">
+            <form id="create-event-form" class="event-form">
+                <div class="form-group">
+                    <label for="event-name">Nombre del Evento</label>
+                    <input type="text" id="event-name" placeholder="Ej: Partido amistoso de fútbol" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-date">Fecha</label>
+                    <input type="date" id="event-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-time">Hora</label>
+                    <input type="time" id="event-time" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-duration">Duración</label>
+                    <select id="event-duration" required>
+                        <option value="">Selecciona la duración</option>
+                        <option value="1">1 hora</option>
+                        <option value="1.5">1.5 horas</option>
+                        <option value="2">2 horas</option>
+                        <option value="2.5">2.5 horas</option>
+                        <option value="3">3 horas</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-court">Cancha / Mesa</label>
+                    <select id="event-court" required disabled>
+                        <option value="">Primero selecciona fecha, hora y duración</option>
+                    </select>
+                    <div id="availability-info" class="availability-info" style="display: none;">
+                        <span id="availability-text"></span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="max-players">Jugadores Necesarios</label>
+                        <input type="number" id="max-players" min="2" max="50" placeholder="10" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="event-level">Nivel</label>
+                        <select id="event-level" required>
+                            <option value="principiante">Principiante</option>
+                            <option value="intermedio">Intermedio</option>
+                            <option value="avanzado">Avanzado</option>
+                            <option value="todos">Todos los niveles</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-description">Descripción</label>
+                    <textarea id="event-description" rows="4" placeholder="Describe tu evento, reglas especiales, etc." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">Crear Evento y Reservar</button>
+            </form>
+        </main>
+    </div>
+
+    <!-- Vista Principal de Torneos -->
+    <div id="tournaments-view" class="view">
+        <header class="app-header">
+            <div class="header-content">
+                <button id="back-to-dashboard-tournaments" class="btn-back">← Volver</button>
+                <h1 class="logo">Torneos Deportivos</h1>
+                <div class="user-info">
+                    <span id="user-name-tournaments">Usuario</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="tournaments-content">
+            <div class="tournaments-header">
+                <h2>Explora y Participa en Torneos</h2>
+                <div class="header-actions">
+                    <button id="create-tournament-btn" class="btn btn-primary">+ Crear Torneo</button>
+                </div>
+            </div>
+
+            <!-- Pestañas -->
+            <div class="tournaments-tabs">
+                <button class="tab-btn active" data-tab="official">
+                    <span class="tab-icon">🏆</span>
+                    Torneos Oficiales UNAB
+                </button>
+                <button class="tab-btn" data-tab="friendly">
+                    <span class="tab-icon">⚽</span>
+                    Torneos Amistosos
+                </button>
+            </div>
+
+            <!-- Filtros -->
+            <div class="tournaments-filters">
+                <label for="tournament-sport-filter">Filtrar por deporte:</label>
+                <select id="tournament-sport-filter">
+                    <option value="all">Todos los deportes</option>
+                    <option value="futbol">Fútbol</option>
+                    <option value="basketball">Basketball</option>
+                    <option value="tenis">Tenis</option>
+                    <option value="padel">Pádel</option>
+                    <option value="volleyball">Volleyball</option>
+                    <option value="billar">Billar</option>
+                    <option value="pingpong">Ping Pong</option>
+                </select>
+
+                <label for="tournament-status-filter">Estado:</label>
+                <select id="tournament-status-filter">
+                    <option value="all">Todos</option>
+                    <option value="abierto">Abiertos</option>
+                    <option value="en-curso">En Curso</option>
+                    <option value="finalizado">Finalizados</option>
+                </select>
+            </div>
+
+            <!-- Contenido de Torneos Oficiales -->
+            <div id="official-tournaments-content" class="tab-content active">
+                <div id="official-tournaments-list" class="tournaments-list">
+                    <!-- Los torneos oficiales se cargarán dinámicamente -->
+                </div>
+                <div id="no-official-tournaments" class="no-tournaments" style="display: none;">
+                    <p>No hay torneos oficiales disponibles</p>
+                    <p id="admin-only-msg" style="display: none;">Solo los administradores pueden crear torneos oficiales</p>
+                </div>
+            </div>
+
+            <!-- Contenido de Torneos Amistosos -->
+            <div id="friendly-tournaments-content" class="tab-content">
+                <div id="friendly-tournaments-list" class="tournaments-list">
+                    <!-- Los torneos amistosos se cargarán dinámicamente -->
+                </div>
+                <div id="no-friendly-tournaments" class="no-tournaments" style="display: none;">
+                    <p>No hay torneos amistosos disponibles</p>
+                    <p>¡Sé el primero en crear uno!</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Vista de Crear Torneo -->
+    <div id="create-tournament-view" class="view">
+        <header class="app-header">
+            <div class="header-content">
+                <button id="back-to-tournaments" class="btn-back">← Volver</button>
+                <h1 class="logo">Crear Torneo</h1>
+            </div>
+        </header>
+
+        <main class="create-tournament-content">
+            <form id="create-tournament-form" class="tournament-form">
+                <div class="form-group">
+                    <label for="tournament-type">Tipo de Torneo</label>
+                    <select id="tournament-type" required>
+                        <option value="">Selecciona un tipo</option>
+                        <option value="oficial" id="official-option">Oficial UNAB (Solo Administradores)</option>
+                        <option value="amistoso">Amistoso</option>
+                    </select>
+                    <small class="form-help">Los torneos oficiales solo pueden ser creados por administradores</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="tournament-name">Nombre del Torneo</label>
+                    <input type="text" id="tournament-name" placeholder="Ej: Torneo Interclases de Fútbol 2025" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="tournament-sport">Deporte</label>
+                    <select id="tournament-sport" required>
+                        <option value="">Selecciona un deporte</option>
+                        <option value="futbol">Fútbol</option>
+                        <option value="basketball">Basketball</option>
+                        <option value="tenis">Tenis</option>
+                        <option value="padel">Pádel</option>
+                        <option value="volleyball">Volleyball</option>
+                        <option value="billar">Billar</option>
+                        <option value="pingpong">Ping Pong</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tournament-start-date">Fecha de Inicio</label>
+                        <input type="date" id="tournament-start-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tournament-end-date">Fecha de Finalización</label>
+                        <input type="date" id="tournament-end-date" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tournament-max-participants">Participantes Máximos</label>
+                        <input type="number" id="tournament-max-participants" min="4" max="64" placeholder="16" required>
+                        <small class="form-help">Mínimo 4, máximo 64</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tournament-format">Formato</label>
+                        <select id="tournament-format" required>
+                            <option value="eliminacion-directa">Eliminación Directa</option>
+                            <option value="round-robin">Round Robin (Todos contra todos)</option>
+                            <option value="grupos">Fase de Grupos + Eliminación</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tournament-duration">Duración Estimada por Partido</label>
+                    <select id="tournament-duration" required>
+                        <option value="">Selecciona la duración</option>
+                        <option value="1">1 hora</option>
+                        <option value="1.5">1.5 horas</option>
+                        <option value="2">2 horas</option>
+                        <option value="2.5">2.5 horas</option>
+                        <option value="3">3 horas</option>
+                    </select>
+                    <small class="form-help">Duración aproximada de cada partido del torneo</small>
+                </div>
+
+                <div id="tournament-availability-info" class="availability-info" style="display: none; margin-bottom: 20px;">
+                    <span id="tournament-availability-text"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="tournament-description">Descripción</label>
+                    <textarea id="tournament-description" rows="4" placeholder="Describe el torneo, objetivos, modalidades, etc." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="tournament-rules">Reglas y Reglamento</label>
+                    <textarea id="tournament-rules" rows="4" placeholder="Especifica las reglas del torneo, requisitos de participación, etc." required></textarea>
+                </div>
+
+                <div class="form-group" id="prizes-field" style="display: none;">
+                    <label for="tournament-prizes">Premios</label>
+                    <textarea id="tournament-prizes" rows="3" placeholder="Describe los premios para los ganadores (opcional)"></textarea>
+                    <small class="form-help">Disponible solo para torneos oficiales</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-large">Crear Torneo</button>
+            </form>
+        </main>
+    </div>
+
+    <!-- Vista de Detalle de Torneo -->
+    <div id="tournament-detail-view" class="view">
+        <header class="app-header">
+            <div class="header-content">
+                <button id="back-to-tournaments-list" class="btn-back">← Volver</button>
+                <h1 class="logo">Detalle del Torneo</h1>
+            </div>
+        </header>
+
+        <main class="tournament-detail-content">
+            <div class="tournament-detail-card">
+                <div class="tournament-badge-container">
+                    <h2 id="detail-tournament-name">Nombre del Torneo</h2>
+                    <span id="detail-tournament-type-badge" class="tournament-type-badge">Oficial</span>
+                </div>
+
+                <div class="tournament-status-banner" id="detail-tournament-status-banner">
+                    <span id="detail-tournament-status">Abierto</span>
+                </div>
+
+                <div class="tournament-info">
+                    <div class="info-item">
+                        <span class="info-label">Deporte:</span>
+                        <span id="detail-tournament-sport" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fecha Inicio:</span>
+                        <span id="detail-tournament-start-date" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fecha Fin:</span>
+                        <span id="detail-tournament-end-date" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Formato:</span>
+                        <span id="detail-tournament-format" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Organizador:</span>
+                        <span id="detail-tournament-organizer" class="info-value">-</span>
+                    </div>
+                </div>
+
+                <div class="participants-section">
+                    <h3>Participantes</h3>
+                    <div class="participants-count">
+                        <span id="detail-tournament-current-participants">0</span> / <span id="detail-tournament-max-participants">0</span> participantes
+                    </div>
+                    <div class="progress-bar">
+                        <div id="detail-tournament-progress" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="description-section">
+                    <h3>Descripción</h3>
+                    <p id="detail-tournament-description">-</p>
+                </div>
+
+                <div class="prizes-section" id="prizes-section" style="display: none;">
+                    <h3>Premios</h3>
+                    <p id="detail-tournament-prizes">-</p>
+                </div>
+
+                <div class="rules-section">
+                    <h3>Reglas y Formato</h3>
+                    <p id="detail-tournament-rules">-</p>
+                </div>
+
+                <button id="join-tournament-btn" class="btn btn-primary btn-large">Inscribirse al Torneo</button>
+                <p id="tournament-full-msg" class="tournament-full-msg" style="display: none;">Este torneo está lleno</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Vista de Detalle de Evento -->
+    <div id="event-detail-view" class="view">
+        <header class="app-header">
+            <div class="header-content">
+                <button id="back-to-events-list" class="btn-back">← Volver</button>
+                <h1 class="logo">Detalle del Evento</h1>
+            </div>
+        </header>
+
+        <main class="event-detail-content">
+            <div class="event-detail-card">
+                <h2 id="detail-event-name">Nombre del Evento</h2>
+
+                <div class="event-info">
+                    <div class="info-item">
+                        <span class="info-label">Deporte:</span>
+                        <span id="detail-sport" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Fecha:</span>
+                        <span id="detail-date" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hora:</span>
+                        <span id="detail-time" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Duración:</span>
+                        <span id="detail-duration" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cancha/Mesa:</span>
+                        <span id="detail-court" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Nivel:</span>
+                        <span id="detail-level" class="info-value">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Organizador:</span>
+                        <span id="detail-organizer" class="info-value">-</span>
+                    </div>
+                </div>
+
+                <div class="players-section">
+                    <h3>Participantes</h3>
+                    <div class="players-count">
+                        <span id="detail-current-players">0</span> / <span id="detail-max-players">0</span> jugadores
+                    </div>
+                    <div class="progress-bar">
+                        <div id="detail-progress" class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <div class="description-section">
+                    <h3>Descripción</h3>
+                    <p id="detail-description">-</p>
+                </div>
+
+                <button id="join-event-btn" class="btn btn-primary btn-large">Unirme al Evento</button>
+                <p id="event-full-msg" class="event-full-msg" style="display: none;">Este evento está lleno</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Vista de Perfil -->
+    <div id="profile-view" class="view">
+        <header class="app-header">
+            <div class="header-content">
+                <button id="back-to-dashboard-profile" class="btn-back">
+                    <i data-feather="arrow-left"></i> Volver
+                </button>
+                <h1 class="logo">Mi Perfil</h1>
+                <div class="user-info">
+                    <span id="user-name-profile">Usuario</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="profile-content">
+            <!-- Header del Perfil -->
+            <div class="profile-header-card">
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar" id="profile-avatar">
+                        <span id="profile-avatar-text">U</span>
+                    </div>
+                    <button class="btn-change-avatar" id="change-avatar-btn" title="Cambiar avatar">
+                        <i data-feather="camera"></i>
+                    </button>
+                </div>
+                <div class="profile-header-info">
+                    <h2 id="profile-full-name">Usuario</h2>
+                    <p class="profile-email" id="profile-email">usuario@unab.edu.co</p>
+                    <p class="profile-bio" id="profile-bio">Estudiante apasionado por los deportes</p>
+                    <button class="btn btn-outline" id="edit-profile-btn">
+                        <i data-feather="edit-2"></i> Editar Perfil
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estadísticas Dashboard -->
+            <div class="stats-section">
+                <h3 class="section-title">
+                    <i data-feather="trending-up"></i> Estadísticas
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i data-feather="plus-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4 id="stat-events-created">0</h4>
+                            <p>Eventos Creados</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">
+                            <i data-feather="calendar"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4 id="stat-events-joined">0</h4>
+                            <p>Eventos Unidos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i data-feather="award"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4 id="stat-tournaments-joined">0</h4>
+                            <p>Torneos Participados</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">
+                            <i data-feather="activity"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4 id="stat-total-matches">0</h4>
+                            <p>Partidos Jugados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deporte Más Jugado y Racha -->
+            <div class="profile-two-col">
+                <div class="favorite-sport-card">
+                    <h3 class="section-title">
+                        <i data-feather="star"></i> Deporte Favorito
+                    </h3>
+                    <div class="favorite-sport-content">
+                        <div class="sport-icon-large" id="favorite-sport-icon">⚽</div>
+                        <div class="favorite-sport-info">
+                            <h4 id="favorite-sport-name">Fútbol</h4>
+                            <p id="favorite-sport-count">0 partidos</p>
+                            <div class="sport-percentage">
+                                <div class="percentage-bar">
+                                    <div class="percentage-fill" id="favorite-sport-percentage" style="width: 0%"></div>
+                                </div>
+                                <span id="favorite-sport-percent-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="activity-streak-card">
+                    <h3 class="section-title">
+                        <i data-feather="zap"></i> Racha de Actividad
+                    </h3>
+                    <div class="streak-content">
+                        <div class="streak-stat">
+                            <i data-feather="calendar-check" class="streak-icon"></i>
+                            <div>
+                                <h4 id="streak-this-month">0</h4>
+                                <p>Eventos este mes</p>
+                            </div>
+                        </div>
+                        <div class="streak-stat">
+                            <i data-feather="clock" class="streak-icon"></i>
+                            <div>
+                                <h4 id="streak-upcoming">0</h4>
+                                <p>Próximos eventos</p>
+                            </div>
+                        </div>
+                        <div class="streak-stat">
+                            <i data-feather="check-circle" class="streak-icon"></i>
+                            <div>
+                                <h4 id="streak-completed">0</h4>
+                                <p>Eventos completados</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Deportes -->
+            <div class="chart-section">
+                <h3 class="section-title">
+                    <i data-feather="pie-chart"></i> Distribución por Deportes
+                </h3>
+                <div class="chart-container">
+                    <canvas id="sports-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Mis Eventos -->
+            <div class="profile-events-section">
+                <h3 class="section-title">
+                    <i data-feather="calendar"></i> Mis Eventos
+                </h3>
+                <div class="profile-tabs">
+                    <button class="profile-tab-btn active" data-tab="created">
+                        <i data-feather="plus-circle"></i> Creados
+                    </button>
+                    <button class="profile-tab-btn" data-tab="joined">
+                        <i data-feather="user-check"></i> Unidos
+                    </button>
+                </div>
+
+                <div id="profile-events-created" class="profile-tab-content active">
+                    <div id="events-created-list" class="profile-events-list">
+                        <!-- Eventos creados se cargarán dinámicamente -->
+                    </div>
+                    <div id="no-events-created" class="no-data" style="display: none;">
+                        <i data-feather="info"></i>
+                        <p>No has creado ningún evento aún</p>
+                    </div>
+                </div>
+
+                <div id="profile-events-joined" class="profile-tab-content">
+                    <div id="events-joined-list" class="profile-events-list">
+                        <!-- Eventos unidos se cargarán dinámicamente -->
+                    </div>
+                    <div id="no-events-joined" class="no-data" style="display: none;">
+                        <i data-feather="info"></i>
+                        <p>No te has unido a ningún evento aún</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mis Torneos -->
+            <div class="profile-tournaments-section">
+                <h3 class="section-title">
+                    <i data-feather="award"></i> Mis Torneos
+                </h3>
+                <div id="profile-tournaments-list" class="profile-tournaments-list">
+                    <!-- Torneos se cargarán dinámicamente -->
+                </div>
+                <div id="no-tournaments" class="no-data" style="display: none;">
+                    <i data-feather="info"></i>
+                    <p>No estás inscrito en ningún torneo aún</p>
+                </div>
+            </div>
+
+            <!-- Información Adicional -->
+            <div class="profile-info-section">
+                <h3 class="section-title">
+                    <i data-feather="user"></i> Información Adicional
+                </h3>
+                <div class="profile-info-grid">
+                    <div class="info-card">
+                        <i data-feather="book" class="info-icon"></i>
+                        <div>
+                            <p class="info-label">Programa Académico</p>
+                            <p class="info-value" id="profile-program">No especificado</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <i data-feather="layers" class="info-icon"></i>
+                        <div>
+                            <p class="info-label">Semestre</p>
+                            <p class="info-value" id="profile-semester">No especificado</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <i data-feather="hash" class="info-icon"></i>
+                        <div>
+                            <p class="info-label">Código Estudiantil</p>
+                            <p class="info-value" id="profile-code">No especificado</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="favorite-sports-section">
+                    <h4>
+                        <i data-feather="heart"></i> Deportes Favoritos
+                    </h4>
+                    <div id="profile-favorite-sports" class="favorite-sports-list">
+                        <!-- Lista de deportes favoritos -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Edición de Perfil -->
+    <div id="edit-profile-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <i data-feather="edit-2"></i> Editar Perfil
+                </h2>
+                <button class="modal-close" id="close-edit-modal">
+                    <i data-feather="x"></i>
+                </button>
+            </div>
+            <form id="edit-profile-form" class="modal-form">
+                <div class="form-group">
+                    <label for="edit-full-name">
+                        <i data-feather="user"></i> Nombre Completo
+                    </label>
+                    <input type="text" id="edit-full-name" placeholder="Ej: Juan Pérez" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-bio">
+                        <i data-feather="message-circle"></i> Biografía
+                    </label>
+                    <textarea id="edit-bio" rows="3" placeholder="Cuéntanos sobre ti..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-program">
+                            <i data-feather="book"></i> Programa Académico
+                        </label>
+                        <input type="text" id="edit-program" placeholder="Ej: Ingeniería de Sistemas">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-semester">
+                            <i data-feather="layers"></i> Semestre
+                        </label>
+                        <input type="number" id="edit-semester" min="1" max="12" placeholder="Ej: 5">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-code">
+                        <i data-feather="hash"></i> Código Estudiantil
+                    </label>
+                    <input type="text" id="edit-code" placeholder="Ej: U00123456">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i data-feather="heart"></i> Deportes Favoritos
+                    </label>
+                    <div class="sports-selector">
+                        <div class="sport-checkbox">
+                            <input type="checkbox" id="fav-futbol" value="futbol">
+                            <label for="fav-futbol">⚽ Fútbol</label>
+                        </div>
+                        <div class="sport-checkbox">
+                            <input type="checkbox" id="fav-basketball" value="basketball">
+                            <label for="fav-basketball">🏀 Basketball</label>
+                        </div>
+                        <div class="sport-checkbox">
+                            <input type="checkbox" id="fav-tenis" value="tenis">
+                            <label for="fav-tenis">🎾 Tenis</label>
+                        </div>
+                        <div class="sport-checkbox">
+                            <input type="checkbox" id="fav-padel" value="padel">
+                            <label for="fav-padel">🏸 Pádel</label>
+                        </div>
+                        <div class="sport-checkbox">
+                            <input type="checkbox" id="fav-volleyball" value="volleyball">
+                            <label for="fav-volleyball">🏐 Volleyball</label>
+                        </div>
+                        <div class="sport-checkbox">
+                            <input type="checkbox" id="fav-billar" value="billar">
+                            <label for="fav-billar">🎱 Billar</label>
+                        </div>
+                        <div class="sport-checkbox">
+                            <input type="checkbox" id="fav-pingpong" value="pingpong">
+                            <label for="fav-pingpong">🏓 Ping Pong</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i data-feather="palette"></i> Color de Avatar
+                    </label>
+                    <div class="avatar-colors">
+                        <div class="color-option" data-color="#FF6B35" style="background: #FF6B35;"></div>
+                        <div class="color-option" data-color="#FFB627" style="background: #FFB627;"></div>
+                        <div class="color-option" data-color="#4CAF50" style="background: #4CAF50;"></div>
+                        <div class="color-option" data-color="#2196F3" style="background: #2196F3;"></div>
+                        <div class="color-option" data-color="#9C27B0" style="background: #9C27B0;"></div>
+                        <div class="color-option" data-color="#E91E63" style="background: #E91E63;"></div>
+                        <div class="color-option" data-color="#00BCD4" style="background: #00BCD4;"></div>
+                        <div class="color-option" data-color="#FF9800" style="background: #FF9800;"></div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit-btn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i data-feather="save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+    <!-- Configuración API (NO incluir en git) -->
+    <script src="config.js"></script>
+
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+</body>
+</html>
