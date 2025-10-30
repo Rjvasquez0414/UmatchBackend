@@ -49,7 +49,7 @@ class Event extends Model
 
     public function participants(): BelongsToMany
     {
-        return $this->belongsToMany(User::class)->withTimestamps()->withPivot('joined_at');
+        return $this->belongsToMany(User::class)->withPivot('joined_at');
     }
 
     public function reservation(): HasOne

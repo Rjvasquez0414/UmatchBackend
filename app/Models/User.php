@@ -58,7 +58,7 @@ class User extends Authenticatable
 
     public function eventsJoined()
     {
-        return $this->belongsToMany(Event::class)->withTimestamps()->withPivot('joined_at');
+        return $this->belongsToMany(Event::class)->withPivot('joined_at');
     }
 
     public function tournamentsCreated()
@@ -68,7 +68,7 @@ class User extends Authenticatable
 
     public function tournamentsJoined()
     {
-        return $this->belongsToMany(Tournament::class)->withTimestamps()->withPivot('joined_at');
+        return $this->belongsToMany(Tournament::class)->withPivot('joined_at');
     }
 
     public function favoriteSports()
