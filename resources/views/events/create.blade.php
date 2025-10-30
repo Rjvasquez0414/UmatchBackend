@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="duration">Duración *</label>
+                    <label for="duration">DuraciÃ³n *</label>
                     <select id="duration" name="duration" class="form-control" required>
                         <option value="">Seleccionar...</option>
                         <option value="1" {{ old('duration') == '1' ? 'selected' : '' }}>1 hora</option>
@@ -100,7 +100,7 @@
             </div>
 
             <div class="form-group">
-                <label for="description">Descripción *</label>
+                <label for="description">DescripciÃ³n *</label>
                 <textarea id="description" name="description" class="form-control" rows="4" required>{{ old('description') }}</textarea>
                 @error('description')
                     <span class="form-error">{{ $message }}</span>

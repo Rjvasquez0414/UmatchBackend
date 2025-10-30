@@ -8,6 +8,7 @@ use App\Models\Court;
 use App\Models\CourtReservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
@@ -82,6 +83,11 @@ class EventController extends Controller
                 ->with('success', '¡Evento creado exitosamente!');
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error al crear evento: ' . $e->getMessage(), [
+                'sport_id' => $sport->id,
+                'user_id' => auth()->id(),
+                'exception' => $e
+            ]);
             return back()->withInput()->with('error', 'Error al crear el evento. Por favor intenta de nuevo.');
         }
     }
@@ -153,6 +159,11 @@ class EventController extends Controller
                 ->with('success', 'Evento cancelado exitosamente.');
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error al cancelar evento: ' . $e->getMessage(), [
+                'event_id' => $event->id,
+                'user_id' => auth()->id(),
+                'exception' => $e
+            ]);
             return back()->with('error', 'Error al cancelar el evento.');
         }
     }
