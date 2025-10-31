@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Configurar encoding UTF-8 para multibyte strings
+        mb_internal_encoding('UTF-8');
+
+        // Configurar locale español para Carbon (fechas)
+        \Carbon\Carbon::setLocale('es');
     }
 }

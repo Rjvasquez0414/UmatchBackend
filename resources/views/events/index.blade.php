@@ -67,8 +67,8 @@
             <div class="empty-icon">
                 <i data-feather="calendar" style="width: 64px; height: 64px;"></i>
             </div>
-            <h3>No hay eventos próximos</h3>
-            <p>Sé el primero en crear un evento de {{ $sport->name }}</p>
+            <h3>No hay eventos prÃ³ximos</h3>
+            <p>SÃ© el primero en crear un evento de {{ $sport->name }}</p>
             <a href="{{ route('events.create', $sport->slug) }}" class="btn btn-primary">
                 <i data-feather="plus"></i>
                 Crear Evento

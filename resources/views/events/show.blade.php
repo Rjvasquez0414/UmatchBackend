@@ -24,10 +24,10 @@
         </div>
 
         <div class="event-detail-grid">
-            <!-- Columna Izquierda: Informaci髇 -->
+            <!-- Columna Izquierda: Informaci贸n -->
             <div class="event-detail-main">
                 <div class="detail-card">
-                    <h3><i data-feather="info"></i> Informaci髇 del Evento</h3>
+                    <h3><i data-feather="info"></i> Informaci贸n del Evento</h3>
                     <div class="detail-info">
                         <div class="detail-item">
                             <span class="detail-label">
@@ -43,7 +43,7 @@
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">
-                                <i data-feather="watch"></i> Duraci髇
+                                <i data-feather="watch"></i> Duraci贸n
                             </span>
                             <span class="detail-value">{{ $event->duration }} {{ $event->duration == 1 ? 'hora' : 'horas' }}</span>
                         </div>
@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="detail-card">
-                    <h3><i data-feather="file-text"></i> Descripci髇</h3>
+                    <h3><i data-feather="file-text"></i> Descripci贸n</h3>
                     <p class="event-description">{{ $event->description }}</p>
                 </div>
 
@@ -87,7 +87,7 @@
                             @endforeach
                         </div>
                     @else
-                        <p class="text-muted">A鷑 no hay participantes</p>
+                        <p class="text-muted">A煤n no hay participantes</p>
                     @endif
                 </div>
             </div>
@@ -116,14 +116,14 @@
                     @if($isParticipant && !$isOrganizer)
                         <form method="POST" action="{{ route('events.leave', [$sport->slug, $event->id]) }}">
                             @csrf
-                            <button type="submit" class="btn btn-secondary btn-block" onclick="return confirm('縀st醩 seguro de que quieres abandonar este evento?')">
+                            <button type="submit" class="btn btn-secondary btn-block" onclick="return confirm('驴Est谩s seguro de que quieres abandonar este evento?')">
                                 <i data-feather="user-minus"></i>
                                 Abandonar Evento
                             </button>
                         </form>
                         <div class="alert alert-info" style="margin-top: var(--spacing-md);">
                             <i data-feather="check-circle"></i>
-                            Ya est醩 inscrito
+                            Ya est谩s inscrito
                         </div>
                     @endif
 
@@ -135,7 +135,7 @@
                         <form method="POST" action="{{ route('events.destroy', [$sport->slug, $event->id]) }}">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('縀st醩 seguro de que quieres cancelar este evento?')">
+                            <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('驴Est谩s seguro de que quieres cancelar este evento?')">
                                 <i data-feather="trash-2"></i>
                                 Cancelar Evento
                             </button>
