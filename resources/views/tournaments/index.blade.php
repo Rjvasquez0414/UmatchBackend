@@ -63,70 +63,76 @@
     </div>
 
     @if($tournaments->count() > 0)
-        <div class="tournaments-grid">
-            @foreach($tournaments as $tournament)
-                <div class="tournament-card">
-                    <div class="tournament-header">
-                        <div class="tournament-title-row">
-                            <span class="sport-emoji-medium">{{ $tournament->sport->emoji }}</span>
-                            <h3>{{ $tournament->name }}</h3>
+        <div class="tournaments-section">
+            <h2 class="section-title">
+                <i data-feather="activity"></i>
+                Torneos Activos
+            </h2>
+            <div class="tournaments-grid">
+                @foreach($tournaments as $tournament)
+                    <div class="tournament-card">
+                        <div class="tournament-header">
+                            <div class="tournament-title-row">
+                                <span class="sport-emoji-medium">{{ $tournament->sport->emoji }}</span>
+                                <h3>{{ $tournament->name }}</h3>
+                            </div>
+                            <div class="tournament-badges">
+                                <span class="badge badge-{{ $tournament->status }}">
+                                    @if($tournament->status === 'abierto')
+                                        Abierto
+                                    @elseif($tournament->status === 'en_progreso')
+                                        En Progreso
+                                    @else
+                                        Finalizado
+                                    @endif
+                                </span>
+                                <span class="badge badge-{{ $tournament->type }}">
+                                    {{ ucfirst($tournament->type) }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="tournament-badges">
-                            <span class="badge badge-{{ $tournament->status }}">
-                                @if($tournament->status === 'abierto')
-                                    Abierto
-                                @elseif($tournament->status === 'en_progreso')
-                                    En Progreso
-                                @else
-                                    Finalizado
-                                @endif
+
+                        <div class="tournament-info">
+                            <div class="info-item">
+                                <i data-feather="target"></i>
+                                {{ $tournament->sport->name }}
+                            </div>
+                            <div class="info-item">
+                                <i data-feather="calendar"></i>
+                                {{ \Carbon\Carbon::parse($tournament->start_date)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($tournament->end_date)->format('d/m/Y') }}
+                            </div>
+                            <div class="info-item">
+                                <i data-feather="map-pin"></i>
+                                {{ $tournament->location }}
+                            </div>
+                            <div class="info-item">
+                                <i data-feather="user"></i>
+                                {{ $tournament->organizer->name }}
+                            </div>
+                        </div>
+
+                        <div class="tournament-participants">
+                            <div class="participants-bar">
+                                <div class="participants-fill" style="width: {{ ($tournament->participants->count() / $tournament->max_participants) * 100 }}%"></div>
+                            </div>
+                            <span class="participants-count">
+                                {{ $tournament->participants->count() }}/{{ $tournament->max_participants }} participantes
                             </span>
-                            <span class="badge badge-{{ $tournament->type }}">
-                                {{ ucfirst($tournament->type) }}
-                            </span>
                         </div>
+
+                        @if($tournament->prize)
+                            <div class="tournament-prize">
+                                <i data-feather="award"></i>
+                                <span>{{ $tournament->prize }}</span>
+                            </div>
+                        @endif
+
+                        <a href="{{ route('tournaments.show', $tournament->id) }}" class="btn btn-secondary btn-block">
+                            Ver Detalle
+                        </a>
                     </div>
-
-                    <div class="tournament-info">
-                        <div class="info-item">
-                            <i data-feather="target"></i>
-                            {{ $tournament->sport->name }}
-                        </div>
-                        <div class="info-item">
-                            <i data-feather="calendar"></i>
-                            {{ \Carbon\Carbon::parse($tournament->start_date)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($tournament->end_date)->format('d/m/Y') }}
-                        </div>
-                        <div class="info-item">
-                            <i data-feather="map-pin"></i>
-                            {{ $tournament->location }}
-                        </div>
-                        <div class="info-item">
-                            <i data-feather="user"></i>
-                            {{ $tournament->organizer->name }}
-                        </div>
-                    </div>
-
-                    <div class="tournament-participants">
-                        <div class="participants-bar">
-                            <div class="participants-fill" style="width: {{ ($tournament->participants->count() / $tournament->max_participants) * 100 }}%"></div>
-                        </div>
-                        <span class="participants-count">
-                            {{ $tournament->participants->count() }}/{{ $tournament->max_participants }} participantes
-                        </span>
-                    </div>
-
-                    @if($tournament->prize)
-                        <div class="tournament-prize">
-                            <i data-feather="award"></i>
-                            <span>{{ $tournament->prize }}</span>
-                        </div>
-                    @endif
-
-                    <a href="{{ route('tournaments.show', $tournament->id) }}" class="btn btn-secondary btn-block">
-                        Ver Detalle
-                    </a>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
     @else
         <div class="empty-state">
@@ -139,6 +145,89 @@
                 <i data-feather="plus"></i>
                 Crear Torneo
             </a>
+        </div>
+    @endif
+
+    <!-- Sección de Histórico de Torneos -->
+    @if(isset($historicalTournaments) && $historicalTournaments->count() > 0)
+        <div class="historical-section">
+            <div class="historical-header">
+                <h2 class="section-title">
+                    <i data-feather="archive"></i>
+                    Histórico de Torneos
+                </h2>
+                <button onclick="toggleHistorical()" class="btn-toggle-historical" id="btnToggleHistorical">
+                    <span id="toggleText">Mostrar</span>
+                    <i data-feather="chevron-down" id="toggleIcon"></i>
+                </button>
+            </div>
+
+            <div class="historical-content" id="historicalContent" style="display: none;">
+                <div class="tournaments-grid">
+                    @foreach($historicalTournaments as $tournament)
+                        <div class="tournament-card historical-card">
+                            <div class="historical-overlay">
+                                <i data-feather="check-circle"></i>
+                                <span>Finalizado</span>
+                            </div>
+                            <div class="tournament-header">
+                                <div class="tournament-title-row">
+                                    <span class="sport-emoji-medium">{{ $tournament->sport->emoji }}</span>
+                                    <h3>{{ $tournament->name }}</h3>
+                                </div>
+                                <div class="tournament-badges">
+                                    <span class="badge badge-{{ $tournament->status }}">
+                                        Finalizado
+                                    </span>
+                                    <span class="badge badge-{{ $tournament->type }}">
+                                        {{ ucfirst($tournament->type) }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="tournament-info">
+                                <div class="info-item">
+                                    <i data-feather="target"></i>
+                                    {{ $tournament->sport->name }}
+                                </div>
+                                <div class="info-item">
+                                    <i data-feather="calendar"></i>
+                                    {{ \Carbon\Carbon::parse($tournament->start_date)->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($tournament->end_date)->format('d/m/Y') }}
+                                </div>
+                                <div class="info-item">
+                                    <i data-feather="map-pin"></i>
+                                    {{ $tournament->location }}
+                                </div>
+                                <div class="info-item">
+                                    <i data-feather="user"></i>
+                                    {{ $tournament->organizer->name }}
+                                </div>
+                            </div>
+
+                            <div class="tournament-participants">
+                                <div class="participants-bar">
+                                    <div class="participants-fill historical-fill" style="width: {{ ($tournament->participants->count() / $tournament->max_participants) * 100 }}%"></div>
+                                </div>
+                                <span class="participants-count">
+                                    {{ $tournament->participants->count() }} participantes
+                                </span>
+                            </div>
+
+                            @if($tournament->prize)
+                                <div class="tournament-prize historical-prize">
+                                    <i data-feather="award"></i>
+                                    <span>{{ $tournament->prize }}</span>
+                                </div>
+                            @endif
+
+                            <a href="{{ route('tournaments.show', $tournament->id) }}" class="btn btn-secondary btn-block">
+                                <i data-feather="eye"></i>
+                                Ver Resultados
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
         </div>
     @endif
 </div>
@@ -613,6 +702,199 @@
 .tournament-card:nth-child(4) { animation-delay: 0.4s; }
 .tournament-card:nth-child(5) { animation-delay: 0.5s; }
 .tournament-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Sección de Títulos */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--texto-primario);
+    margin-bottom: var(--spacing-xl);
+}
+
+.section-title i {
+    width: 32px;
+    height: 32px;
+    color: var(--naranja-unab);
+}
+
+.tournaments-section {
+    margin-bottom: var(--spacing-3xl);
+}
+
+/* Histórico de Torneos */
+.historical-section {
+    margin-top: var(--spacing-3xl);
+    padding-top: var(--spacing-2xl);
+    border-top: 3px solid var(--gris-200);
+}
+
+.historical-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.btn-toggle-historical {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: linear-gradient(135deg, var(--gris-100) 0%, var(--gris-50) 100%);
+    border: 2px solid var(--gris-300);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    color: var(--texto-primario);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.btn-toggle-historical:hover {
+    background: linear-gradient(135deg, var(--naranja-lighter) 0%, var(--amarillo-lighter) 100%);
+    border-color: var(--naranja-unab);
+    color: var(--naranja-unab);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(232, 85, 30, 0.2);
+}
+
+.btn-toggle-historical i {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--transition-base);
+}
+
+.btn-toggle-historical.active i {
+    transform: rotate(180deg);
+}
+
+.historical-content {
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.historical-content.show {
+    display: block !important;
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tarjetas Históricas */
+.historical-card {
+    position: relative;
+    opacity: 0.9;
+    border: 2px solid var(--gris-300) !important;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+}
+
+.historical-card::before {
+    background: linear-gradient(90deg, var(--gris-400) 0%, var(--gris-500) 100%);
+}
+
+.historical-card:hover {
+    opacity: 1;
+    border-color: var(--gris-500) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.historical-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(158, 158, 158, 0.95);
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.historical-overlay i {
+    width: 16px;
+    height: 16px;
+}
+
+.historical-fill {
+    background: linear-gradient(90deg, var(--gris-400) 0%, var(--gris-500) 100%) !important;
+    box-shadow: 0 0 10px rgba(158, 158, 158, 0.4) !important;
+}
+
+.historical-prize {
+    background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.1) 100%) !important;
+    border-color: rgba(158, 158, 158, 0.3) !important;
+    color: #616161 !important;
+    box-shadow: 0 4px 12px rgba(158, 158, 158, 0.2) !important;
+}
+
+.historical-prize i {
+    color: #757575 !important;
+}
+
+@media (max-width: 768px) {
+    .historical-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .btn-toggle-historical {
+        width: 100%;
+        justify-content: center;
+    }
+}
 </style>
+@endpush
+
+@push('scripts')
+<script>
+function toggleHistorical() {
+    const content = document.getElementById('historicalContent');
+    const button = document.getElementById('btnToggleHistorical');
+    const icon = document.getElementById('toggleIcon');
+    const text = document.getElementById('toggleText');
+
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        content.classList.add('show');
+        button.classList.add('active');
+        text.textContent = 'Ocultar';
+
+        // Re-initialize feather icons for dynamically shown content
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+        }
+    } else {
+        content.classList.remove('show');
+        setTimeout(() => {
+            content.style.display = 'none';
+        }, 500);
+        button.classList.remove('active');
+        text.textContent = 'Mostrar';
+    }
+}
+</script>
 @endpush
 @endsection

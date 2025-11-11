@@ -20,6 +20,9 @@ yarn-error.log
 /mockup-original/config.js
 # macOS
 .DS_Store
-
+GUIA_RAPIDA.md
+INSTALACION.md
+README.md
+GUIA_ESTUDIO_UMATCH.md
 # Windows
 Thumbs.db

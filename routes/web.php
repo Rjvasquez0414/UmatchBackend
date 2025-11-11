@@ -38,9 +38,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/crear', [TournamentController::class, 'create'])->name('tournaments.create');
         Route::post('/', [TournamentController::class, 'store'])->name('tournaments.store');
         Route::get('/{tournament}', [TournamentController::class, 'show'])->name('tournaments.show');
+        Route::get('/{tournament}/brackets', [TournamentController::class, 'brackets'])->name('tournaments.brackets');
+        Route::get('/{tournament}/tabla', [TournamentController::class, 'standings'])->name('tournaments.standings');
         Route::post('/{tournament}/unirse', [TournamentController::class, 'join'])->name('tournaments.join');
         Route::post('/{tournament}/abandonar', [TournamentController::class, 'leave'])->name('tournaments.leave');
         Route::patch('/{tournament}/iniciar', [TournamentController::class, 'start'])->name('tournaments.start');
+        Route::patch('/{tournament}/finalizar', [TournamentController::class, 'finish'])->name('tournaments.finish');
+        Route::patch('/matches/{match}', [TournamentController::class, 'updateMatch'])->name('tournaments.updateMatch');
         Route::delete('/{tournament}', [TournamentController::class, 'destroy'])->name('tournaments.destroy');
     });
 

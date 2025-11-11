@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tournament extends Model
 {
@@ -48,6 +49,11 @@ class Tournament extends Model
     public function participants(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withPivot('joined_at');
+    }
+
+    public function matches(): HasMany
+    {
+        return $this->hasMany(TournamentMatch::class);
     }
 
     // Accessors

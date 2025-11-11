@@ -101,6 +101,30 @@
                     </div>
                 @endif
 
+                <!-- Sección de Resultados/Brackets (cuando está en progreso o finalizado) -->
+                @if($tournament->status !== 'abierto')
+                    <div class="detail-card results-card">
+                        <h3><i data-feather="git-branch"></i> Brackets y Resultados</h3>
+                        <p class="results-description">
+                            @if($tournament->status === 'en_progreso')
+                                El torneo está en curso. Haz clic en el botón para ver los brackets actualizados, partidos pendientes y resultados.
+                            @else
+                                El torneo ha finalizado. Revisa los resultados finales y el campeón del torneo.
+                            @endif
+                        </p>
+                        <a href="{{ route('tournaments.brackets', $tournament->id) }}" class="btn-view-brackets">
+                            <div class="brackets-icon">
+                                <i data-feather="git-branch"></i>
+                            </div>
+                            <div class="brackets-text">
+                                <strong>{{ $tournament->status === 'en_progreso' ? 'Ver Brackets en Vivo' : 'Ver Resultados Finales' }}</strong>
+                                <span>Visualiza las llaves del torneo y todos los partidos</span>
+                            </div>
+                            <i data-feather="chevron-right" class="brackets-arrow"></i>
+                        </a>
+                    </div>
+                @endif
+
                 <div class="detail-card">
                     <h3><i data-feather="users"></i> Participantes ({{ $tournament->participants->count() }}/{{ $tournament->max_participants }})</h3>
                     <div class="participants-bar-large">
@@ -184,6 +208,13 @@
                             <i data-feather="play-circle"></i>
                             Torneo en curso
                         </div>
+
+                        <!-- Botón para ver brackets -->
+                        <a href="{{ route('tournaments.brackets', $tournament->id) }}" class="btn btn-primary btn-block" style="margin-top: var(--spacing-md);">
+                            <i data-feather="git-branch"></i>
+                            Ver Brackets y Resultados
+                        </a>
+
                         @if($isParticipant)
                             <div class="alert alert-success" style="margin-top: var(--spacing-md);">
                                 <i data-feather="check-circle"></i>
@@ -195,6 +226,12 @@
                             <i data-feather="check-square"></i>
                             Torneo finalizado
                         </div>
+
+                        <!-- Botón para ver brackets finales -->
+                        <a href="{{ route('tournaments.brackets', $tournament->id) }}" class="btn btn-secondary btn-block" style="margin-top: var(--spacing-md);">
+                            <i data-feather="award"></i>
+                            Ver Resultados Finales
+                        </a>
                     @endif
 
                     @if($isOrganizer)
@@ -214,14 +251,27 @@
                             </form>
                         @endif
 
-                        <form method="POST" action="{{ route('tournaments.destroy', $tournament->id) }}" style="margin-top: var(--spacing-md);">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('¿Estás seguro de que quieres cancelar este torneo?')">
-                                <i data-feather="trash-2"></i>
-                                Cancelar Torneo
-                            </button>
-                        </form>
+                        @if($tournament->status === 'en_progreso')
+                            <form method="POST" action="{{ route('tournaments.finish', $tournament->id) }}" style="margin-top: var(--spacing-md);">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn btn-success btn-block" onclick="return confirm('¿Finalizar el torneo? Esto marcará el torneo como completado.')">
+                                    <i data-feather="check-circle"></i>
+                                    Finalizar Torneo
+                                </button>
+                            </form>
+                        @endif
+
+                        @if($tournament->status === 'abierto')
+                            <form method="POST" action="{{ route('tournaments.destroy', $tournament->id) }}" style="margin-top: var(--spacing-md);">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-block" onclick="return confirm('¿Estás seguro de que quieres cancelar este torneo?')">
+                                    <i data-feather="trash-2"></i>
+                                    Cancelar Torneo
+                                </button>
+                            </form>
+                        @endif
                     @endif
                 </div>
 
@@ -464,6 +514,97 @@
 .text-muted {
     color: var(--texto-terciario);
     font-style: italic;
+}
+
+/* Tarjeta de Resultados/Brackets */
+.results-card {
+    background: linear-gradient(135deg, rgba(232, 85, 30, 0.05) 0%, rgba(245, 166, 35, 0.05) 100%);
+    border: 2px solid var(--naranja-unab);
+    box-shadow: 0 8px 24px rgba(232, 85, 30, 0.15);
+}
+
+.results-description {
+    color: var(--texto-secundario);
+    line-height: 1.6;
+    margin-bottom: var(--spacing-lg);
+}
+
+.btn-view-brackets {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--naranja-unab) 0%, var(--amarillo-unab) 100%);
+    color: white;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    box-shadow: 0 4px 16px rgba(232, 85, 30, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-view-brackets::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-view-brackets:hover::before {
+    left: 100%;
+}
+
+.btn-view-brackets:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(232, 85, 30, 0.4);
+}
+
+.brackets-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.brackets-icon i {
+    width: 28px;
+    height: 28px;
+}
+
+.brackets-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.brackets-text strong {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.brackets-text span {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.brackets-arrow {
+    width: 24px;
+    height: 24px;
+    transition: transform var(--transition-base);
+}
+
+.btn-view-brackets:hover .brackets-arrow {
+    transform: translateX(8px);
 }
 
 @media (max-width: 1024px) {

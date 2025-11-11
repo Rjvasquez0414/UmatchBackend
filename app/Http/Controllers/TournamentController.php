@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tournament;
+use App\Models\TournamentMatch;
 use App\Models\Sport;
+use App\Services\BracketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -36,9 +38,25 @@ class TournamentController extends Controller
             $query->where('type', $selectedType);
         }
 
-        $tournaments = $query->orderBy('start_date', 'desc')->get();
+        // Si no hay filtro de status o el filtro no es "finalizado", mostrar solo activos
+        if (!$selectedStatus || $selectedStatus !== 'finalizado') {
+            $tournaments = $query->whereIn('status', ['abierto', 'en_progreso'])
+                ->orderBy('start_date', 'desc')->get();
 
-        return view('tournaments.index', compact('tournaments', 'sports'));
+            // Obtener torneos históricos (finalizados) de los últimos 6 meses
+            $historicalTournaments = Tournament::with(['sport', 'organizer', 'participants'])
+                ->where('status', 'finalizado')
+                ->where('end_date', '>=', now()->subMonths(6))
+                ->orderBy('end_date', 'desc')
+                ->limit(10)
+                ->get();
+        } else {
+            // Si el filtro es "finalizado", mostrar todos los finalizados
+            $tournaments = $query->orderBy('end_date', 'desc')->get();
+            $historicalTournaments = collect(); // Colección vacía
+        }
+
+        return view('tournaments.index', compact('tournaments', 'sports', 'historicalTournaments'));
     }
 
     // Mostrar formulario de creación
@@ -151,7 +169,7 @@ class TournamentController extends Controller
     }
 
     // Iniciar torneo (solo organizador)
-    public function start(Tournament $tournament)
+    public function start(Tournament $tournament, BracketService $bracketService)
     {
         // Verificar que sea el organizador
         if ($tournament->organizer_id !== auth()->id()) {
@@ -169,15 +187,100 @@ class TournamentController extends Controller
             return back()->with('error', "Se necesitan al menos {$minParticipants} participantes para iniciar el torneo.");
         }
 
-        // Cambiar estado a en_progreso
-        $tournament->update([
-            'status' => 'en_progreso'
+        try {
+            // Generar brackets automáticamente según el formato
+            $bracketService->generateBracket($tournament);
+
+            // Cambiar estado a en_progreso
+            $tournament->update([
+                'status' => 'en_progreso'
+            ]);
+
+            return redirect()->route('tournaments.brackets', $tournament->id)
+                ->with('success', '¡Torneo iniciado exitosamente! Los brackets han sido generados.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al generar brackets: ' . $e->getMessage());
+        }
+    }
+
+    // Ver brackets del torneo
+    public function brackets(Tournament $tournament)
+    {
+        $tournament->load(['sport', 'organizer', 'participants']);
+
+        $isOrganizer = $tournament->organizer_id === auth()->id();
+
+        // Obtener todos los matches con sus relaciones
+        $matches = TournamentMatch::where('tournament_id', $tournament->id)
+            ->with(['player1', 'player2', 'winner', 'court'])
+            ->orderBy('round_order', 'desc')
+            ->orderBy('match_number', 'asc')
+            ->get();
+
+        // Agrupar por ronda para facilitar la visualización
+        $matchesByRound = $matches->groupBy('round');
+
+        return view('tournaments.brackets', compact('tournament', 'matches', 'matchesByRound', 'isOrganizer'));
+    }
+
+    // Actualizar resultado de un partido
+    public function updateMatch(Request $request, TournamentMatch $match, BracketService $bracketService)
+    {
+        // Verificar que sea el organizador
+        if ($match->tournament->organizer_id !== auth()->id()) {
+            return back()->with('error', 'Solo el organizador puede editar resultados.');
+        }
+
+        $validated = $request->validate([
+            'player1_score' => 'required|integer|min:0',
+            'player2_score' => 'required|integer|min:0',
+            'notes' => 'nullable|string|max:500',
         ]);
 
-        // TODO: Generar brackets automáticamente según el formato
-        // Por ahora solo cambiamos el estado
+        try {
+            $bracketService->updateMatchResult(
+                $match,
+                $validated['player1_score'],
+                $validated['player2_score'],
+                $validated['notes'] ?? null
+            );
 
-        return back()->with('success', '¡Torneo iniciado exitosamente!');
+            return back()->with('success', 'Resultado actualizado exitosamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error: ' . $e->getMessage());
+        }
+    }
+
+    // Ver tabla de posiciones (Round Robin)
+    public function standings(Tournament $tournament, BracketService $bracketService)
+    {
+        if ($tournament->format !== 'round_robin') {
+            return redirect()->route('tournaments.brackets', $tournament->id);
+        }
+
+        $tournament->load(['sport', 'organizer', 'participants']);
+        $standings = $bracketService->getRoundRobinStandings($tournament);
+        $matches = $tournament->matches()->with(['player1', 'player2', 'winner'])->get();
+
+        return view('tournaments.standings', compact('tournament', 'standings', 'matches'));
+    }
+
+    // Finalizar torneo manualmente (solo organizador)
+    public function finish(Tournament $tournament)
+    {
+        // Verificar que sea el organizador
+        if ($tournament->organizer_id !== auth()->id()) {
+            return back()->with('error', 'Solo el organizador puede finalizar el torneo.');
+        }
+
+        // Verificar que esté en progreso
+        if ($tournament->status !== 'en_progreso') {
+            return back()->with('error', 'Solo se pueden finalizar torneos que estén en progreso.');
+        }
+
+        $tournament->update(['status' => 'finalizado']);
+
+        return back()->with('success', '¡Torneo finalizado exitosamente!');
     }
 
     // Cancelar torneo (solo organizador)
